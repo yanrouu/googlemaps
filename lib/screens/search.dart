@@ -1,36 +1,54 @@
 import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:test_loc/models/place.dart';
 
 class Search extends StatelessWidget {
+  @override
   Widget build(BuildContext context) {
     final currentPosition = Provider.of<Position>(context);
+    final placesProvider = Provider.of<Future<List<Place>>>(context);
 
-    return Scaffold(
-      body: (currentPosition != null)
-          ? GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target:
-                    LatLng(currentPosition.latitude, currentPosition.longitude),
-                zoom: 16.0,
-              ),
-              markers: Set<Marker>.of([
-                Marker(
-                  markerId: MarkerId("current_position"),
-                  position: LatLng(
-                      currentPosition.latitude, currentPosition.longitude),
-                  infoWindow: InfoWindow(
-                    title: "Current Position",
+    return FutureProvider(
+      create: (context) => placesProvider,
+      initialData: [],
+      child: Scaffold(
+        body: (currentPosition != null)
+            ? Column(
+                children: <Widget>[
+                  Container(
+                    height: MediaQuery.of(context).size.height / 2,
+                    width: MediaQuery.of(context).size.width,
+                    child: GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(currentPosition.latitude,
+                            currentPosition.longitude),
+                        zoom: 16.0,
+                      ),
+                      zoomGesturesEnabled: true,
+                    ),
                   ),
-                ),
-              ]),
-            )
-          : Center(
-              child: CircularProgressIndicator(),
-            ),
+                  // SizedBox(
+                  //   height: 10.0,
+                  // ),
+                  // Expanded(
+                  //   child: ListView.builder(
+                  //       itemCount: places.length,
+                  //       itemBuilder: (context, index) {
+                  //         Card(
+                  //           child: ListTile(
+                  //             title: places[index].name,
+                  //           ),
+                  //         );
+                  //       }),
+                  // )
+                ],
+              )
+            : Center(
+                child: CircularProgressIndicator(),
+              ),
+      ),
     );
   }
 }
